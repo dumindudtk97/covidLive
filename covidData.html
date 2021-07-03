@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVID-19 Live</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class = "text-center mt-5">Covid-19 Live Data</h1>
+        <br><br>
+        <table class="table table-hover">
+            <tr>
+                <th>World data</th>
+            </tr>
+            <tr>
+                <th>Total Cases</th>
+                <th>Total Recovered</th>
+                <th>Total Deaths</th>
+                <th>Total Perecentage Recovered</th>
+            </tr>
+            <tr id="worldData">
+
+            </tr>
+        </table>
+        <br><br>
+        <form action="">
+            <select id="selectCountry" onchange="countriesData()">
+                <option value="">Choose a country</option>
+            </select>
+        </form>
+        <br><br>
+        <table class="table table-hover">
+            <tr>
+                <th>Country based data</th>
+            </tr>
+            <tr>
+                <th>Total Cases</th>
+                <th>Total Recovered</th>
+                <th>Total Deaths</th>
+                <th>Total Perecentage Recovered</th>
+            </tr>
+            <tr id="countryData">
+
+            </tr>
+        </table>
+        <br><br>
+    </div>
+    
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    var worldData = ''
+    worldInit()
+    worldCountries()
+    function worldInit(){
+        var url = "https://api.covid19api.com/summary"
+        $.get(url,function(worldData){
+            percentageRecovered = ((worldData.Global.TotalRecovered/worldData.Global.TotalConfirmed)*100).toFixed(2)
+            worldData=`<td>${worldData.Global.TotalConfirmed}</td>
+                        <td>${worldData.Global.TotalRecovered}</td>
+                        <td>${worldData.Global.TotalDeaths}</td>
+                        <td>${percentageRecovered}</td>`
+                        $("#worldData").html(worldData)
+        })
+    }
+    async function worldCountries(){
+        var url = "https://api.covid19api.com/countries"
+        $.get(url,function(countryData){
+            for(var i = 0;i<=countryData.length-1;i++){
+                $("#selectCountry").append("<option value = "+countryData[i].Country+">"+countryData[i].Country+"</option>")
+            }
+        })
+    }
+    function countriesData(){
+        var url = "https://api.covid19api.com/summary"
+        $.get(url,function(countryData){
+            for(var count = 0;count<=countryData.Countries.length;count++){
+                var selected = $("#selectCountry").find('option:selected').text()
+                console.log(selected)
+                if(countryData.Countries[count].Country == selected){
+                    percentageRecoveredbyCountry = ((countryData.Countries[count].TotalRecovered/countryData.Countries[count].TotalConfirmed)*100).toFixed(2)
+                    countryData=`<td>${countryData.Countries[count].TotalConfirmed}</td>
+                            <td>${countryData.Countries[count].TotalRecovered}</td>
+                            <td>${countryData.Countries[count].TotalDeaths}</td>
+                            <td>${percentageRecoveredbyCountry}</td>`
+                            $("#countryData").html(countryData)
+                            break;
+                }
+            }
+        })
+    }
+    //done
+    // has to add some visuals (charts etc...)
+</script>
+</html>
